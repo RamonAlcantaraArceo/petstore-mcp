@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://ramonalcantaraarceo.github.io/petstore-mcp/architecture/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://ramonalcantaraarceo.github.io/petstore-mcp/configuration/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://ramonalcantaraarceo.github.io/petstore-mcp/deployment-guide/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://ramonalcantaraarceo.github.io/petstore-mcp/development-guide/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://ramonalcantaraarceo.github.io/petstore-mcp/overview/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://ramonalcantaraarceo.github.io/petstore-mcp/resources/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://ramonalcantaraarceo.github.io/petstore-mcp/tools/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+</urlset>
