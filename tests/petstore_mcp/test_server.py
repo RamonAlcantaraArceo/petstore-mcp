@@ -14,9 +14,6 @@ class _App:
 
         Args:
             _name: App name.
-
-        Returns:
-            None.
         """
         self.tool_calls: list[tuple[str, str]] = []
         self.resource_calls: list[str] = []

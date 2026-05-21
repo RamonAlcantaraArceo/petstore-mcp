@@ -10,11 +10,7 @@ from petstore_mcp.tools import TOOL_REGISTRY, ToolContext, register_tools
 
 
 class _StubClient:
-    """Test client implementation for tools.
-
-    Returns:
-        None.
-    """
+    """Test client implementation for tools."""
 
     async def get_health(self) -> dict[str, Any]:
         """Return mock health response.
@@ -59,11 +55,7 @@ class _AppStub:
     """Application test double for registration APIs."""
 
     def __init__(self) -> None:
-        """Initialize app stub.
-
-        Returns:
-            None.
-        """
+        """Initialize app stub."""
         self.handlers: dict[str, Callable[..., Any]] = {}
 
     def tool(

@@ -25,9 +25,6 @@ class PetstoreClient:
             base_url: API base URL.
             api_key: Optional API key.
             timeout_seconds: Timeout in seconds.
-
-        Returns:
-            None.
         """
         self._base_url = base_url.rstrip("/")
         self._api_key = api_key
@@ -73,7 +70,7 @@ class PetstoreClient:
                 return response.json()
         except (httpx.HTTPError, ValueError) as exc:
             LOGGER.exception("Petstore API request failed", extra={"path": path, "method": method})
-            raise RuntimeError(f"Petstore API request failed: {method} {path}") from exc
+            raise RuntimeError(f"Petstore API request failed: {method} {path}: {exc!r}") from exc
 
     async def get_health(self) -> dict[str, Any]:
         """Fetch the health payload.

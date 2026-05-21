@@ -179,13 +179,18 @@ def register_tools(app: Any, context: ToolContext) -> None:
     Returns:
         None.
     """
-    for spec in TOOL_REGISTRY:
 
-        async def handler_factory(
-            *,
-            _spec: ToolSpec = spec,
-            **kwargs: Any,
-        ) -> dict[str, Any]:
+    def build_handler(spec: ToolSpec) -> Callable[..., Awaitable[dict[str, Any]]]:
+        """Create an isolated MCP handler for one tool spec.
+
+        Args:
+            spec: Tool metadata to bind.
+
+        Returns:
+            Async MCP handler function.
+        """
+
+        async def handler_factory(**kwargs: Any) -> dict[str, Any]:
             """Create execution wrapper around a registered tool.
 
             Args:
@@ -198,18 +203,23 @@ def register_tools(app: Any, context: ToolContext) -> None:
                 RuntimeError: If execution fails.
             """
             try:
-                validated_input = _spec.input_model.model_validate(kwargs)
+                validated_input = spec.input_model.model_validate(kwargs)
                 result = await asyncio.wait_for(
-                    _spec.handler(context, validated_input),
+                    spec.handler(context, validated_input),
                     timeout=context.timeout_seconds,
                 )
-                validated_output = _spec.output_model.model_validate(result)
+                validated_output = spec.output_model.model_validate(result)
                 return validated_output.model_dump(mode="json")
             except TimeoutError as exc:
-                LOGGER.exception("Tool timed out", extra={"tool": _spec.name})
-                raise RuntimeError(f"Tool timed out: {_spec.name}") from exc
+                LOGGER.exception("Tool timed out", extra={"tool": spec.name})
+                raise RuntimeError(
+                    f"Tool timed out after {context.timeout_seconds}s: {spec.name}"
+                ) from exc
             except Exception as exc:
-                LOGGER.exception("Tool failed", extra={"tool": _spec.name})
-                raise RuntimeError(f"Tool execution failed: {_spec.name}") from exc
+                LOGGER.exception("Tool failed", extra={"tool": spec.name})
+                raise RuntimeError(f"Tool execution failed: {spec.name}: {exc!r}") from exc
 
-        app.tool(name=spec.name, description=spec.description)(handler_factory)
+        return handler_factory
+
+    for spec in TOOL_REGISTRY:
+        app.tool(name=spec.name, description=spec.description)(build_handler(spec))
