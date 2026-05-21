@@ -4,7 +4,7 @@
 [![Docs](https://github.com/RamonAlcantaraArceo/petstore-mcp/actions/workflows/docs.yml/badge.svg)](https://github.com/RamonAlcantaraArceo/petstore-mcp/actions/workflows/docs.yml)
 [![codecov](https://codecov.io/gh/RamonAlcantaraArceo/petstore-mcp/branch/main/graph/badge.svg)](https://codecov.io/gh/RamonAlcantaraArceo/petstore-mcp)
 
-Production-ready Python MCP server scaffold for the Petstore API.
+Production-ready Python MCP server for the Petstore API.
 
 ## Quickstart
 
