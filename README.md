@@ -9,7 +9,8 @@ Production-ready Python MCP server scaffold for the Petstore API.
 ## Quickstart
 
 ```bash
-uv sync --dev
+uv venv --seed --python 3.14 .venv
+uv sync --all-extras
 uv run ruff check .
 uv run ruff format --check .
 uv run pytest
