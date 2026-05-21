@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "ruff:check",
+      "type": "shell",
+      "command": "uv run ruff check ."
+    },
+    {
+      "label": "ruff:format",
+      "type": "shell",
+      "command": "uv run ruff format ."
+    },
+    {
+      "label": "prettier:markdown",
+      "type": "shell",
+      "command": "npx --yes prettier --write \"**/*.md\""
+    },
+    {
+      "label": "test:pytest",
+      "type": "shell",
+      "command": "uv run pytest"
+    },
+    {
+      "label": "allure:report",
+      "type": "shell",
+      "command": "uv run pytest && npx --yes allure-commandline generate allure-results --clean -o allure-report"
+    },
+    {
+      "label": "mcp:run",
+      "type": "shell",
+      "command": "uv run petstore-mcp"
+    }
+  ]
+}

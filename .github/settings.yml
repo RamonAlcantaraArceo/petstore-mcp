@@ -1,0 +1,11 @@
+repository:
+  topics:
+    - mcp
+    - model-context-protocol
+    - uv
+    - ruff
+    - pytest
+    - allure
+    - github-packages
+    - vscode
+    - agent-automation
