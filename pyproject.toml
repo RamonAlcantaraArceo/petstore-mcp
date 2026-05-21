@@ -1,0 +1,72 @@
+[project]
+name = "petstore-mcp"
+version = "0.1.0"
+description = "Production-ready MCP server for the Petstore API"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+  { name = "Ramon Alcantara Arceo", email = "ramalc.ms@outlook.com" }
+]
+dependencies = [
+  "httpx>=0.28.1",
+  "mcp>=1.9.3",
+  "pydantic>=2.11.4",
+  "pydantic-settings>=2.9.1",
+  "python-dotenv>=1.1.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/RamonAlcantaraArceo/petstore-mcp"
+Repository = "https://github.com/RamonAlcantaraArceo/petstore-mcp"
+Documentation = "https://ramonalcantaraarceo.github.io/petstore-mcp"
+
+[project.scripts]
+petstore-mcp = "petstore_mcp.__main__:main"
+
+[dependency-groups]
+dev = [
+  "allure-pytest>=2.15.0",
+  "mkdocs>=1.6.1",
+  "mkdocs-material>=9.6.14",
+  "pre-commit>=4.2.0",
+  "pytest>=8.3.5",
+  "pytest-asyncio>=1.0.0",
+  "pytest-cov>=6.1.1",
+  "ruff>=0.11.11"
+]
+
+[build-system]
+requires = ["hatchling>=1.26.3"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+addopts = "-q --junitxml=junit.xml --cov=src/petstore_mcp --cov-report=xml:coverage.xml --alluredir=allure-results"
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "D", "UP", "B", "A", "C4", "SIM", "RUF"]
+ignore = ["D100", "D104", "D105", "D107"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.allure]
+results_dir = "allure-results"
+report_dir = "allure-report"
+clean_results_dir = true
+
+[tool.coverage.run]
+source = ["src/petstore_mcp"]
+branch = true

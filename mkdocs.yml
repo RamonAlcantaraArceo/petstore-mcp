@@ -1,0 +1,14 @@
+site_name: petstore-mcp
+site_url: https://ramonalcantaraarceo.github.io/petstore-mcp
+repo_url: https://github.com/RamonAlcantaraArceo/petstore-mcp
+theme:
+  name: material
+nav:
+  - Overview: overview.md
+  - Architecture: architecture.md
+  - Tools: tools.md
+  - Resources: resources.md
+  - Configuration: configuration.md
+  - Development Guide: development-guide.md
+  - Deployment Guide: deployment-guide.md
+docs_dir: docs
