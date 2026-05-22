@@ -57,6 +57,18 @@ class PetstoreClient:
             headers["X-API-Key"] = self._api_key
 
         url = f"{self._base_url}/{path.lstrip('/')}"
+        # Redact API key value for logs; show that it's present and its length.
+        log_headers = {
+            k: (f"<redacted len={len(v)}>" if k.lower() == "x-api-key" else v)
+            for k, v in headers.items()
+        }
+        LOGGER.debug(
+            "Petstore API outbound request: method=%s url=%s headers=%s params=%s",
+            method,
+            url,
+            log_headers,
+            params,
+        )
         try:
             async with httpx.AsyncClient(timeout=self._timeout_seconds) as client:
                 response = await client.request(

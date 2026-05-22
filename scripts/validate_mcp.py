@@ -3,7 +3,7 @@
 
 Usage:
   uv run python scripts/validate_mcp.py
-  python scripts/validate_mcp.py --api-base-url http://localhost:8080 --api-key yourkey --timeout 5
+  python scripts/validate_mcp.py --api-base-url http://localhost:8000 --api-key yourkey --timeout 5
 """
 
 from __future__ import annotations
@@ -37,8 +37,22 @@ class _AppStub:
         return decorator
 
 
+def _print_hint_for_error(exc: Exception) -> None:
+    """Print actionable hints for common runtime failures."""
+    message = str(exc)
+    if "401" in message or "Unauthorized" in message:
+        print(
+            "HINT: Pet endpoints require auth. Set PETSTORE_MCP_API_KEY or pass --api-key."
+        )
+    if "ConnectError" in message or "All connection attempts failed" in message:
+        print(
+            "HINT: Verify PETSTORE_MCP_API_BASE_URL points to a reachable Petstore API instance."
+        )
+
+
 async def run_checks(api_base_url: str, api_key: str | None, timeout: float) -> int:
     print(f"Using Petstore API base: {api_base_url}")
+    print("Note: this script validates tool wiring + API connectivity, not MCP network transport.")
     client = PetstoreClient(base_url=api_base_url, api_key=api_key, timeout_seconds=timeout)
 
     try:
@@ -47,6 +61,7 @@ async def run_checks(api_base_url: str, api_key: str | None, timeout: float) -> 
         print(json.dumps(health, indent=2))
     except Exception as exc:  # pragma: no cover - network/runtime dependent
         print("ERROR: Petstore API health check failed:", exc)
+        _print_hint_for_error(exc)
         traceback.print_exc()
         return 2
 
@@ -58,29 +73,32 @@ async def run_checks(api_base_url: str, api_key: str | None, timeout: float) -> 
 
     # Invoke the main tool handlers to validate end-to-end wiring
     try:
-        print("\nInvoking tool: health.check")
-        payload = await app.handlers["health.check"]()
+        print("\nInvoking tool: health_check")
+        payload = await app.handlers["health_check"]()
         print(json.dumps(payload, indent=2))
     except Exception as exc:  # pragma: no cover - network/runtime dependent
-        print("ERROR: health.check failed:", exc)
+        print("ERROR: health_check failed:", exc)
+        _print_hint_for_error(exc)
         traceback.print_exc()
         return 3
 
     try:
-        print("\nInvoking tool: pet.find_by_status (defaults)")
-        payload = await app.handlers["pet.find_by_status"]()
+        print("\nInvoking tool: pet_find_by_status (defaults)")
+        payload = await app.handlers["pet_find_by_status"]()
         print(json.dumps(payload, indent=2))
     except Exception as exc:  # pragma: no cover - network/runtime dependent
-        print("ERROR: pet.find_by_status failed:", exc)
+        print("ERROR: pet_find_by_status failed:", exc)
+        _print_hint_for_error(exc)
         traceback.print_exc()
         return 4
 
     try:
-        print("\nInvoking tool: pet.get_by_id (pet_id=1)")
-        payload = await app.handlers["pet.get_by_id"](pet_id=1)
+        print("\nInvoking tool: pet_get_by_id (pet_id=1)")
+        payload = await app.handlers["pet_get_by_id"](pet_id=1)
         print(json.dumps(payload, indent=2))
     except Exception as exc:  # pragma: no cover - network/runtime dependent
-        print("ERROR: pet.get_by_id failed:", exc)
+        print("ERROR: pet_get_by_id failed:", exc)
+        _print_hint_for_error(exc)
         traceback.print_exc()
         return 5
 

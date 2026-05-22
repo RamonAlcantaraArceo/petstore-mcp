@@ -1,5 +1,6 @@
 """Server bootstrap for Petstore MCP."""
 
+import inspect
 import logging
 from typing import Any
 
@@ -26,6 +27,19 @@ def create_app(settings: Settings | None = None, client: PetstoreClient | None =
 
     resolved_settings = settings or Settings()
     configure_logging(resolved_settings.log_level)
+    LOGGER.debug(
+        (
+            "Resolved Petstore API configuration: base_url=%s "
+            "timeout_seconds=%s key=%s transport=%s host=%s port=%s mount_path=%s"
+        ),
+        resolved_settings.api_base_url,
+        resolved_settings.request_timeout_seconds,
+        resolved_settings.api_key,
+        resolved_settings.transport,
+        resolved_settings.host,
+        resolved_settings.port,
+        resolved_settings.mount_path,
+    )
 
     resolved_client = client or PetstoreClient(
         base_url=resolved_settings.api_base_url,
@@ -33,7 +47,16 @@ def create_app(settings: Settings | None = None, client: PetstoreClient | None =
         timeout_seconds=resolved_settings.request_timeout_seconds,
     )
 
-    app = FastMCP("petstore-mcp")
+    init_params = inspect.signature(FastMCP).parameters
+    fastmcp_kwargs: dict[str, Any] = {}
+    if "host" in init_params:
+        fastmcp_kwargs["host"] = resolved_settings.host
+    if "port" in init_params:
+        fastmcp_kwargs["port"] = resolved_settings.port
+    if "mount_path" in init_params:
+        fastmcp_kwargs["mount_path"] = resolved_settings.mount_path
+
+    app = FastMCP("petstore-mcp", **fastmcp_kwargs)
     register_tools(
         app,
         ToolContext(
@@ -52,8 +75,9 @@ def run() -> None:
     Returns:
         None.
     """
-    app = create_app()
+    settings = Settings()
+    app = create_app(settings=settings)
     try:
-        app.run()
+        app.run(transport=settings.transport, mount_path=settings.mount_path)
     except KeyboardInterrupt:
         LOGGER.info("Petstore MCP server shutdown requested")

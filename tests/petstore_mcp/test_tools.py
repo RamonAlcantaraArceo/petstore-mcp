@@ -102,5 +102,5 @@ async def test_tool_handler_returns_valid_payload() -> None:
     """
     app = _AppStub()
     register_tools(app, ToolContext(client=_StubClient(), timeout_seconds=1))
-    payload = await app.handlers["pet.get_by_id"](**GetPetByIdInput(pet_id=7).model_dump())
+    payload = await app.handlers["pet_get_by_id"](**GetPetByIdInput(pet_id=7).model_dump())
     assert payload["id"] == 7

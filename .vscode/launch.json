@@ -21,6 +21,19 @@
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/src/petstore_mcp/__main__.py"
+    },
+    {
+      "name": "Debug MCP server (streamable-http)",
+      "type": "python",
+      "request": "launch",
+      "module": "petstore_mcp",
+      "env": {
+        "PETSTORE_MCP_TRANSPORT": "streamable-http",
+        "PETSTORE_MCP_HOST": "127.0.0.1",
+        "PETSTORE_MCP_PORT": "8765",
+        "PETSTORE_MCP_MOUNT_PATH": "/",
+        "PETSTORE_MCP_LOG_LEVEL": "DEBUG"
+      }
     }
   ]
 }

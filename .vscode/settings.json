@@ -23,5 +23,13 @@
     "**/allure-results": true,
     "**/allure-report": true,
     "**/site": true
+  },
+  "chat.mcp.serverSampling": {
+    "petstore-mcp/.vscode/mcp.json: petstore-mcp-http": {
+      "allowedModels": [
+        "copilot/gpt-5-mini",
+        "copilotcli/gpt-5-mini"
+      ]
+    }
   }
 }

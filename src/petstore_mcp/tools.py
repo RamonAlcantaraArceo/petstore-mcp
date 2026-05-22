@@ -1,6 +1,7 @@
 """MCP tool registration and implementations."""
 
 import asyncio
+import inspect
 import logging
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
@@ -59,6 +60,27 @@ class ToolContext:
 TOOL_REGISTRY: list[ToolSpec] = []
 
 
+def _build_tool_signature(model: type[BaseModel]) -> inspect.Signature:
+    """Build a callable signature matching a tool input model.
+
+    FastMCP derives MCP tool schemas from the Python callable signature. Without
+    this explicit signature, a `**kwargs` wrapper is exposed as a single
+    required `kwargs` argument over MCP.
+    """
+    parameters: list[inspect.Parameter] = []
+    for field_name, field_info in model.model_fields.items():
+        default = inspect.Parameter.empty if field_info.is_required() else field_info.default
+        parameters.append(
+            inspect.Parameter(
+                field_name,
+                kind=inspect.Parameter.KEYWORD_ONLY,
+                default=default,
+                annotation=field_info.annotation,
+            )
+        )
+    return inspect.Signature(parameters=parameters)
+
+
 def mcp_tool(
     name: str,
     description: str,
@@ -107,7 +129,7 @@ def mcp_tool(
 
 
 @mcp_tool(
-    name="health.check",
+    name="health_check",
     description="Return Petstore service health data.",
     input_model=GetHealthInput,
     output_model=HealthOutput,
@@ -128,7 +150,7 @@ async def get_health_tool(context: ToolContext, payload: BaseModel) -> dict[str,
 
 
 @mcp_tool(
-    name="pet.find_by_status",
+    name="pet_find_by_status",
     description="Find pets filtered by status.",
     input_model=FindPetsByStatusInput,
     output_model=PetsOutput,
@@ -149,7 +171,7 @@ async def find_pets_by_status_tool(context: ToolContext, payload: BaseModel) -> 
 
 
 @mcp_tool(
-    name="pet.get_by_id",
+    name="pet_get_by_id",
     description="Get a pet by identifier.",
     input_model=GetPetByIdInput,
     output_model=PetOutput,
@@ -209,7 +231,11 @@ def register_tools(app: Any, context: ToolContext) -> None:
                     timeout=context.timeout_seconds,
                 )
                 validated_output = spec.output_model.model_validate(result)
-                return validated_output.model_dump(mode="json")
+                dumped = validated_output.model_dump(mode="json")
+                # Log the exact payload we return so hosts (Copilot) and debugging
+                # can inspect whether structured content was provided.
+                LOGGER.debug("Tool %s returning payload: %s", spec.name, dumped)
+                return dumped
             except TimeoutError as exc:
                 LOGGER.exception("Tool timed out", extra={"tool": spec.name})
                 raise RuntimeError(
@@ -219,6 +245,7 @@ def register_tools(app: Any, context: ToolContext) -> None:
                 LOGGER.exception("Tool failed", extra={"tool": spec.name})
                 raise RuntimeError(f"Tool execution failed: {spec.name}: {exc!r}") from exc
 
+        handler_factory.__signature__ = _build_tool_signature(spec.input_model)
         return handler_factory
 
     for spec in TOOL_REGISTRY:
